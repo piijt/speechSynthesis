@@ -1,5 +1,6 @@
 body, html {
   margin: 0;
+  font-family: 'fakt-web',"Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
 html {
@@ -13,7 +14,6 @@ body {
 }
 
 h1, p {
-  font-family: sans-serif;
   text-align: center;
   padding: 20px;
 }
@@ -28,6 +28,14 @@ h1, p {
 
 .txt {
   width: 80%;
+  height: 400px;
+  background-color: #2f383d;
+  color: #00fbca;
+  border-radius: 5px;
+  padding: 20px;
+  font-family: monospace;
+  justify-content: justify;
+
 }
 
 select {
