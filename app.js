@@ -1,21 +1,33 @@
-let helpers = require('./query');
+let log = console.log;
 
-//console log log(something);
-// let log = console.log;
-//
-// // Credits to {NML}
-// let $ = function (foo) {
-//        return document.getElementById(foo);
-//    }
-//
-// let query = function (q) {
-//    return document.querySelector(q);
-// }
-// let queryAll = function (selectors) {
-//  return document.querySelectorAll(selectors);
-// }
+// Credits to {NML}
+let $ = function (foo) {
+       return document.getElementById(foo);
+   }
+
+let query = function (q) {
+   return document.querySelector(q);
+}
+let queryAll = function (selectors) {
+ return document.querySelectorAll(selectors);
+}
+
+// user-agent sniffer
+var browserPrefix;
+navigator.sayswho = (function(){
+  var N = navigator.appName, ua = navigator.userAgent, tem;
+  var M = ua.match(/(opera|chrome|safari|firefox|msie)\/?\s*(\.?\d+(\.\d+)*)/i);
+  if(M && (tem = ua.match(/version\/([\.\d]+)/i))!= null) M[2] = tem[1];
+  M = M? [M[1], M[2]]: [N, navigator.appVersion,'-?'];
+  M = M[0];
+  if(M == "Chrome")   { browserPrefix = "webkit"; }
+  if(M == "Firefox")  { browserPrefix = "moz";    }
+  if(M == "Safari")   { browserPrefix = "webkit"; }
+  if(M == "MSIE")     { browserPrefix = "ms";     }
+})();
 
 let synth = window.speechSynthesis;
+
 
 let inputForm = query('form');
 let inputTxt = query('.txt');
@@ -29,6 +41,7 @@ let stopSpeak = query('#stop')
 let resumeSpeak = query('#resume');
 
 let voices = [];
+let defaultVoice = '<optiondata-lang="en-GB" data-name="Google UK English Male"></option>';
 
 function populateVoiceList() {
   voices = synth.getVoices().sort(function (a, b) {
@@ -37,21 +50,25 @@ function populateVoiceList() {
       else if ( aname == bname ) return 0;
       else return +1;
   });
+
+
+
   let selectedIndex = voiceSelect.selectedIndex < 0 ? 0 : voiceSelect.selectedIndex;
   voiceSelect.innerHTML = '';
   for(i = 0; i < voices.length ; i++) {
     let option = document.createElement('option');
     option.textContent = voices[i].name + ' (' + voices[i].lang + ')';
-
     if(voices[i].default) {
       option.textContent += ' -- DEFAULT';
     }
-
     option.setAttribute('data-lang', voices[i].lang);
     option.setAttribute('data-name', voices[i].name);
     voiceSelect.appendChild(option);
   }
   voiceSelect.selectedIndex = selectedIndex;
+  // if(browserPrefix == 'webkit') {
+  //   console.log(browserPrefix)
+  // }
 }
 
 populateVoiceList();
@@ -64,8 +81,6 @@ function speak(){
         console.error('speechSynthesis.speaking');
         return;
     }
-
-
     if (inputTxt.value !== '') {
     let utterThis = new SpeechSynthesisUtterance(inputTxt.value);
     utterThis.onend = function (event) {
@@ -91,6 +106,7 @@ stopSpeak.addEventListener('click', stopSpeakfx);
 function stopSpeakfx(e) {
   e.preventDefault;
   synth.pause();
+  alert('press resume to continue');
 }
 
 
@@ -101,14 +117,13 @@ function resumeSpeaking(e) {
   synth.resume();
 }
 
-
+// this functions takes care of reading files from the OS.. !FileReader cant read files from abs path
 if( window.FileReader && window.speechSynthesis ) {
     const fileInput = document.getElementById("thisFile");
 
     fileInput.addEventListener("change", event => {
         const Reader = new FileReader();
         Reader.readAsText( fileInput.files[ 0 ] );
-
         Reader.onload = event => {
             const contents = Reader.result;
             const utterThis = new SpeechSynthesisUtterance( contents );
@@ -118,11 +133,9 @@ if( window.FileReader && window.speechSynthesis ) {
 }
 
 
-inputForm.onsubmit = function(event) {
-  event.preventDefault();
-
+inputForm.onsubmit = function(e) {
+  e.preventDefault();
   speak();
-
   inputTxt.blur();
 }
 

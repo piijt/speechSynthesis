@@ -42,5 +42,3 @@ navigator.sayswho = (function(){
   if(M == "MSIE") { browserPrefix = "ms"; }
   log(browserPrefix);
 })();
-
-module.exports = log, $, query, queryAll;
